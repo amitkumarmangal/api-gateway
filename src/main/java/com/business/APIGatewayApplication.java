@@ -17,7 +17,7 @@ public class APIGatewayApplication {
             ServerHttpSecurity http) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
+                .authorizeExchange(ex -> ex
                         .anyExchange().permitAll()
                 )
                 .build();
