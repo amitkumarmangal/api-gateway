@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    config:
+      name: api-gateway
+  application:
+    name: api-gateway,eureka-client,actuator,tracing,logger
+  config:
+    import: optional:configserver:http://localhost:8888
+  main:
+    web-application-type: REACTIVE
+    allow-bean-definition-overriding: true
