@@ -81,7 +81,6 @@ spring:
           filters:
             - JwtAuthenticationFilter
 ````
-
 ---
 
 ## 📊 Distributed Tracing (Zipkin)
