@@ -1,9 +1,9 @@
 spring:
+  application:
+    name: api-gateway
   cloud:
     config:
-      name: api-gateway
-  application:
-    name: api-gateway,eureka-client,actuator,tracing,logger
+      name: api-gateway,eureka-client,actuator,tracing,logger
   config:
     import: optional:configserver:http://localhost:8888
   main:

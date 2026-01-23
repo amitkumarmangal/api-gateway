@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+    <!-- Flush logs on JVM shutdown -->
+    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
+        <delay>2000</delay>
+    </shutdownHook>
+    <!-- ========================= -->
+    <!-- Spring Context Properties -->
+    <!-- ========================= -->
+    <springProperty scope="context" name="SERVICE_NAME" source="spring.application.name"/>
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path"/>
+    <springProperty scope="context" name="LOG_FILE" source="logging.file.name"/>
+    <!-- ========================= -->
+    <!-- JSON Rolling File Appender -->
+    <!-- ========================= -->
+    <appender name="JSON_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE}.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOG_PATH}/${LOG_FILE}-%d{yyyy-MM-dd}.json
+            </fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <!-- Micrometer puts traceId/spanId in MDC -->
+            <includeMdc>true</includeMdc>
+            <!-- Add Micrometer observation fields if present -->
+            <mdcKeyFieldNames>
+                <traceId>traceId</traceId>
+                <spanId>spanId</spanId>
+                <httpMethod>http.method</httpMethod>
+                <uri>http.route</uri>
+                <status>http.status_code</status>
+            </mdcKeyFieldNames>
+            <!-- Static service metadata -->
+            <customFields>
+                {
+                "service":"${SERVICE_NAME}",
+                "environment":"${spring.profiles.active:-default}"
+                }
+            </customFields>
+            <!-- Field name alignment -->
+            <fieldNames>
+                <timestamp>@timestamp</timestamp>
+                <level>level</level>
+                <logger>logger</logger>
+                <thread>thread</thread>
+                <message>message</message>
+            </fieldNames>
+        </encoder>
+    </appender>
+    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <appender-ref ref="JSON_FILE"/>
+    </logger>
+    <logger name="org.hibernate.type.descriptor.sql.BasicBinder" level="TRACE" additivity="false">
+        <appender-ref ref="JSON_FILE"/>
+    </logger>
+    <!-- ========================= -->
+    <!-- Root Logger -->
+    <!-- ========================= -->
+    <root level="DEBUG">
+        <appender-ref ref="JSON_FILE"/>
+    </root>
+</configuration>

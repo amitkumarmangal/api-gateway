@@ -2,3 +2,15 @@ spring:
   cloud:
     config:
       enabled: false
+    discovery:
+      enabled: false
+    service-registry:
+      auto-registration:
+        enabled: false
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+eureka:
+  client:
+    enabled: false
